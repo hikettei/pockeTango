@@ -6,12 +6,24 @@
 //
 
 import UIKit
+import CoreData
+import Firebase
+import SwiftUI
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
-
+    lazy var persistentContainer: NSPersistentCloudKitContainer = {
+        let container = NSPersistentCloudKitContainer(name: "UserProfile")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         return true
@@ -31,6 +43,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
+    var window: UIWindow?
 
+    func application(_ application: UIApplication,
+      didFinishLaunchingWithOptions launchOptions:
+                     [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+      FirebaseApp.configure()
+
+      return true
+    }
 }
+
+extension NSPersistentCloudKitContainer {
+    
+    func saveContext() {
+        saveContext(context: viewContext)
+    }
+
+    func saveContext(context: NSManagedObjectContext) {
+        
+        guard context.hasChanges else {
+            return
+        }
+        
+        do {
+            try context.save()
+        }
+        catch let error as NSError {
+            print("Error: \(error), \(error.userInfo)")
+        }
+    }
+}
+
 
